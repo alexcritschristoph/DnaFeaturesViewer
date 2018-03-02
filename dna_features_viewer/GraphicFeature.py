@@ -27,7 +27,7 @@ class GraphicFeature:
 
     def __init__(self, start=None, end=None, strand=None,
                  label=None, color="#000080", thickness=14, linewidth=1.0,
-                 html=None, **data):
+                 html=None, contig = 1, is_scaf = False, **data):
         self.start = start
         self.end = end
         self.strand = strand
@@ -37,6 +37,8 @@ class GraphicFeature:
         self.thickness = thickness
         self.linewidth = linewidth
         self.html = html
+        self.contig = contig
+        self.is_scaf = is_scaf
 
     def split_in_two(self, x_coord=0):
         copy1 = deepcopy(self)

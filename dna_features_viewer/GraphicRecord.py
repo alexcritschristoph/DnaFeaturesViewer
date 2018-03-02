@@ -135,15 +135,15 @@ class GraphicRecord:
         The x-coordinates of the patch are determined by the feature's
         `start` and `end` while the y-coordinates are determined by the `level`
         """
-        bg_color = change_luminosity(feature.color, luminosity=0.95)
+        bg_color = feature.color
         x, y = self.coordinates_in_plot(feature.x_center, level)
         text = ax.text(
             x, y, feature.label,
             horizontalalignment="center",
             verticalalignment="center",
-            bbox=dict(boxstyle="round",
+            bbox=dict(boxstyle="Square",
                       fc=bg_color if box_color is None else box_color,
-                      ec="0.5", lw=box_linewidth),
+                      ec="0.3", lw=0, alpha=0),
             fontsize=fontsize,
             zorder=2
         )
@@ -151,7 +151,8 @@ class GraphicRecord:
         figure_width = ax.figure.get_size_inches()[0]
         margin = 0.05*figure_width
         x1, y1, x2, y2 = get_text_box(text, margin=margin)
-        overflowing = (x1 < feature.start) or (x2 > feature.end)
+        overflowing = False
+        #overflowing = (x1 < feature.start) or (x2 > feature.end)
         return text, overflowing, (x1, x2)
 
     def plot(self, ax=None, figure_width=8, draw_line=True, with_ruler=True,
@@ -178,10 +179,17 @@ class GraphicRecord:
         for feature, level in features_levels.items():
             self.plot_feature(ax=ax, feature=feature, level=level)
             if feature.label is not None:
-                text, overflowing, (x1, x2) = self.annotate_feature(
-                    ax=ax, feature=feature, level=level, fontsize=fontsize,
-                    box_linewidth=box_linewidth, box_color=box_color
-                )
+                if not feature.is_scaf:
+                    text, overflowing, (x1, x2) = self.annotate_feature(
+                        ax=ax, feature=feature, level=level, fontsize=fontsize,
+                        box_linewidth=box_linewidth, box_color=box_color
+                    )
+                else:
+                    text, overflowing, (x1, x2) = self.annotate_feature(
+                        ax=ax, feature=feature, level=level, fontsize=fontsize,
+                        box_linewidth=0, box_color="white"
+                    )
+
                 if overflowing or not annotate_inline:
                     overflowing_annotations.append(GraphicFeature(
                         start=x1, end=x2, feature=feature,

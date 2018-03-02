@@ -64,8 +64,36 @@ class Graph:
             self.neighbors[n1].append(n2)
             self.neighbors[n2].append(n1)
 
-
 def compute_features_levels(features):
+    edges = [
+        (f1, f2)
+        for f1, f2 in itertools.combinations(features, 2)
+        if f1.overlaps_with(f2)
+    ]
+    graph = Graph(features, edges)
+    levels = {
+        n: None
+        for n in graph.nodes
+    }
+    contig_levels = {}
+    contig_i = 1
+    for node in levels:
+        if node.contig not in contig_levels:
+            contig_levels[node.contig] = contig_i
+            levels[node] = contig_i
+            contig_i += 1
+        else:
+            levels[node] = contig_levels[node.contig]
+#    for node in sorted(graph.nodes, key=lambda f: -f.length):
+#        level = 0
+#        while any([levels[n] == level
+#                   for n in graph.neighbors[node]]):
+#            level += 1
+#        levels[node] = level
+    return levels
+
+
+def compute_features_levels2(features):
     """Compute the vertical levels on which the features should be displayed
     in order to avoid collisions.
 
